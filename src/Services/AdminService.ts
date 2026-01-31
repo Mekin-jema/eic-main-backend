@@ -19,7 +19,7 @@ export class AdminService {
         ]);
 
         return {
-            attendees: attendees.map((item) => ({ date: item._id, count: item.count }))
+            attendees: attendees.map((item: { _id: string, count: number }) => ({ date: item._id, count: item.count }))
         };
     }
 

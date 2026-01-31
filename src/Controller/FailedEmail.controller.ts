@@ -2,6 +2,11 @@ import { Request, Response } from 'express';
 import catchAsyncError from '../Middleware/catchAsyncError';
 import { FailedEmailService } from '../Services/FailedEmailService';
 
+type FailedEmail = {
+    id?: string;
+    [key: string]: any;
+};
+
 // List All: return all failed email records
 export const getAllFailedEmails = catchAsyncError(async (req: Request, res: Response) => {
     const failedEmails = await FailedEmailService.getAll();
@@ -148,7 +153,7 @@ export const retryFailedEmail = catchAsyncError(async (req: Request, res: Respon
 
     // Get the failed email data
     const failedEmails = await FailedEmailService.getAll();
-    const failedEmail = failedEmails.find((email) => email.id === id);
+    const failedEmail = failedEmails.find((email: FailedEmail) => email.id === id);
 
     if (!failedEmail) {
         return res.status(404).json({

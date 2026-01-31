@@ -171,11 +171,11 @@ export class FailedEmailService {
 
             return {
                 total,
-                byStatus: byStatus.map((item) => ({
+                byStatus: byStatus.map((item: { _id: string, count: number }) => ({
                     status: item._id,
                     count: item.count
                 })),
-                byType: byType.map((item) => ({
+                byType: byType.map((item: { _id: string, count: number }) => ({
                     emailType: item._id,
                     count: item.count
                 }))

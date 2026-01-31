@@ -1,6 +1,11 @@
 import catchAsyncError from '../Middleware/catchAsyncError';
 import { AttendeeService } from '../Services/AttendeeService';
 import { errorHandler } from '../Utils/errorHandler';
+type Attendee = {
+    isCheckedIn?: boolean;
+    checkInTime?: Date;
+    [key: string]: any;
+};
 
 // Check-in: mark a user as checked in by type/id
 export const checkInUser = catchAsyncError(async (req, res, next) => {
@@ -157,7 +162,7 @@ export const getAttendanceSummary = catchAsyncError(async (req, res, next) => {
         const attendees = await AttendeeService.findAll();
 
         const totalUsers = attendees.length;
-        const checkedInUsers = attendees.filter((user) => user.isCheckedIn).length;
+        const checkedInUsers = attendees.filter((user: Attendee) => user.isCheckedIn).length;
 
         const attendanceRate = totalUsers > 0 ? (checkedInUsers / totalUsers) * 100 : 0;
 
@@ -165,7 +170,7 @@ export const getAttendanceSummary = catchAsyncError(async (req, res, next) => {
         const yesterday = new Date();
         yesterday.setDate(yesterday.getDate() - 1);
 
-        const recentCheckIns = attendees.filter((user) => user.checkInTime && user.checkInTime > yesterday);
+        const recentCheckIns = attendees.filter((user: Attendee) => user.checkInTime && user.checkInTime > yesterday);
 
         res.status(200).json({
             success: true,
@@ -177,7 +182,7 @@ export const getAttendanceSummary = catchAsyncError(async (req, res, next) => {
                 breakdown: {
                     attendees: {
                         total: attendees.length,
-                        checkedIn: attendees.filter((user) => user.isCheckedIn).length
+                        checkedIn: attendees.filter((user: Attendee) => user.isCheckedIn).length
                     }
                 }
             }

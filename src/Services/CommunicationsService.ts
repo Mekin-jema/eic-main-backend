@@ -83,9 +83,9 @@ export class CommunicationsService {
         },
       },
     ]);
-    const logMap = new Map(logs.map((l) => [l._id ?? '', l]));
+    const logMap = new Map(logs.map((l: { _id?: string, sentCount?: number, openedCount?: number }) => [l._id ?? '', l]));
     return templates.map((tpl: any) => {
-      const agg = logMap.get(tpl.key);
+      const agg = logMap.get(tpl.key) as { sentCount?: number; openedCount?: number } | undefined;
       const sent = agg?.sentCount ?? 0;
       const openRate = sent ? Math.round(((agg?.openedCount ?? 0) / sent) * 100) : 0;
       const lastUsedAt = tpl.lastUsedAt ? new Date(tpl.lastUsedAt as any) : null;
