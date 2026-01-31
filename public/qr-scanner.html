@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Green Energy Event - QR Scanner</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 20px;
+                background-color: #f5f5f5;
+            }
+            .container {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 30px;
+                color: #2c5aa0;
+            }
+            .scanner-section {
+                margin-bottom: 30px;
+            }
+            .manual-input {
+                margin-top: 20px;
+            }
+            input[type='text'] {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                font-size: 16px;
+            }
+            button {
+                background-color: #2c5aa0;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 16px;
+                margin-top: 10px;
+            }
+            button:hover {
+                background-color: #1e3d6f;
+            }
+            .result {
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 5px;
+                display: none;
+            }
+            .success {
+                background-color: #d4edda;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+            }
+            .error {
+                background-color: #f8d7da;
+                border: 1px solid #f5c6cb;
+                color: #721c24;
+            }
+            .user-info {
+                margin-top: 15px;
+                padding: 15px;
+                border-radius: 5px;
+            }
+            .sponsor-info {
+                background-color: #fff8dc;
+                border: 1px solid #d4af37;
+                color: #8b6914;
+            }
+            .exhibitor-info {
+                background-color: #e8f4fd;
+                border: 1px solid #bee5eb;
+                color: #0c5460;
+            }
+            .attendee-info {
+                background-color: #e8f5e8;
+                border: 1px solid #c3e6cb;
+                color: #155724;
+            }
+            .user-type-badge {
+                display: inline-block;
+                padding: 5px 10px;
+                border-radius: 15px;
+                font-size: 12px;
+                font-weight: bold;
+                margin-bottom: 10px;
+            }
+            .sponsor-badge {
+                background-color: #d4af37;
+                color: white;
+            }
+            .exhibitor-badge {
+                background-color: #2c5aa0;
+                color: white;
+            }
+            .attendee-badge {
+                background-color: #28a745;
+                color: white;
+            }
+            .qr-format-info {
+                background-color: #f8f9fa;
+                padding: 10px;
+                border-radius: 5px;
+                margin-top: 10px;
+                font-size: 12px;
+                color: #666;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="header">
+                <h1>GREEN ENERGY EVENT</h1>
+                <h2>Universal QR Code Scanner</h2>
+                <p>Scan QR codes for Sponsors, Exhibitors, and Attendees</p>
+            </div>
+
+            <div class="scanner-section">
+                <h3>Scan QR Code or Enter Manually</h3>
+                <div class="manual-input">
+                    <input type="text" id="qrInput" placeholder="Enter QR code data (e.g., GREEN_ENERGY_EVENT:SPO:507f1f77bcf86cd799439011)" />
+                    <button onclick="verifyQR()">Verify User</button>
+                </div>
+                <div class="qr-format-info">
+                    <strong>QR Format:</strong> GREEN_ENERGY_EVENT:USER_TYPE:USER_ID<br />
+                    <strong>User Types:</strong> SPO (Sponsor), EXH (Exhibitor), ATT (Attendee)
+                </div>
+            </div>
+
+            <div id="result" class="result"></div>
+        </div>
+
+        <script>
+            async function verifyQR() {
+                const qrData = document.getElementById('qrInput').value.trim();
+                const resultDiv = document.getElementById('result');
+
+                if (!qrData) {
+                    showResult('Please enter QR code data', 'error');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/qr/verify', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ qrData: qrData })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        showResult(`${data.userTypeLabel} verified successfully!`, 'success');
+                        showUserInfo(data);
+                    } else {
+                        showResult(data.message || 'Verification failed', 'error');
+                    }
+                } catch (error) {
+                    showResult('Network error: ' + error.message, 'error');
+                }
+            }
+
+            function showResult(message, type) {
+                const resultDiv = document.getElementById('result');
+                resultDiv.className = `result ${type}`;
+                resultDiv.innerHTML = message;
+                resultDiv.style.display = 'block';
+            }
+
+            function showUserInfo(data) {
+                const resultDiv = document.getElementById('result');
+                const user = data.user;
+                const userType = data.userType;
+                const userTypeLabel = data.userTypeLabel;
+
+                // Determine badge class and info class based on user type
+                let badgeClass, infoClass;
+                switch (userType) {
+                    case 'SPO':
+                        badgeClass = 'sponsor-badge';
+                        infoClass = 'sponsor-info';
+                        break;
+                    case 'EXH':
+                        badgeClass = 'exhibitor-badge';
+                        infoClass = 'exhibitor-info';
+                        break;
+                    case 'ATT':
+                        badgeClass = 'attendee-badge';
+                        infoClass = 'attendee-info';
+                        break;
+                    default:
+                        badgeClass = 'exhibitor-badge';
+                        infoClass = 'exhibitor-info';
+                }
+
+                let infoHtml = `
+                <div class="user-type-badge ${badgeClass}">${userTypeLabel}</div>
+                <div class="${infoClass}">
+                    <h4>User Information:</h4>
+                    <p><strong>Name:</strong> ${user.firstName} ${user.lastName}</p>
+                    <p><strong>Email:</strong> ${user.email}</p>
+                    <p><strong>Registration Date:</strong> ${new Date(user.registrationDate).toLocaleDateString()}</p>
+            `;
+
+                // Add type-specific information
+                if (userType === 'SPO' || userType === 'EXH') {
+                    infoHtml += `
+                    <p><strong>Company:</strong> ${user.companyName}</p>
+                    <p><strong>Job Title:</strong> ${user.jobTitle}</p>
+                    <p><strong>Country:</strong> ${user.country}</p>
+                `;
+                    if (userType === 'SPO') {
+                        infoHtml += `<p><strong>Sponsor Amount:</strong> $${user.amount || 'N/A'}</p>`;
+                    }
+                } else if (userType === 'ATT') {
+                    infoHtml += `
+                    <p><strong>Occupation:</strong> ${user.occupation}</p>
+                    <p><strong>Country:</strong> ${user.country}</p>
+                    <p><strong>Registration Type:</strong> ${user.registrationType}</p>
+                `;
+                    if (user.organization) {
+                        infoHtml += `<p><strong>Organization:</strong> ${user.organization}</p>`;
+                    }
+                    if (user.groupSize) {
+                        infoHtml += `<p><strong>Group Size:</strong> ${user.groupSize} people</p>`;
+                    }
+                    if (user.interests && user.interests.length > 0) {
+                        infoHtml += `<p><strong>Interests:</strong> ${user.interests.join(', ')}</p>`;
+                    }
+                }
+
+                infoHtml += `
+                </div>
+            `;
+
+                resultDiv.innerHTML += infoHtml;
+            }
+
+            // Allow Enter key to trigger verification
+            document.getElementById('qrInput').addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    verifyQR();
+                }
+            });
+        </script>
+    </body>
+</html>

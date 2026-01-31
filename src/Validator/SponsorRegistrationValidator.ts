@@ -1,0 +1,2 @@
+// Sponsor validator removed.
+export {};

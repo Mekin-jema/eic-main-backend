@@ -1,0 +1,410 @@
+### Green Energy Event API Tests
+### Base URL - Update this to match your server
+@baseUrl = http://localhost:8000/api
+# @baseUrl = http://m0s4ckcks4csosccgw80g08w.72.61.155.82.sslip.io/api
+
+### Variables for testing
+# @testEmail = benegeta1@gmail.com
+@testEmail = ebaadisu2@gmail.com
+@testEmail2 = sarah.johnson@solarenergy.com
+@testEmail3 = tesfaye.mekonnen@ethiopianpower.com
+
+### ===========================================
+### AUTH ENDPOINTS TESTS
+### ===========================================
+
+# Auth test variables (update as needed)
+@authEmail = admin@example.com
+@authPassword = Admin123!
+@newPassword = AdminPass456!
+# The following need manual values from email/dev:
+@otpCode = 000000
+@resetToken = REPLACE_WITH_TOKEN
+
+### Login: should set admin session cookie
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "{{authEmail}}",
+  "password": "{{authPassword}}"
+}
+
+### Forgot Password: send reset link to email
+POST {{baseUrl}}/auth/forgot-password
+Content-Type: application/json
+
+{
+  "email": "{{authEmail}}"
+}
+
+### Request OTP: send 6-digit code to email
+POST {{baseUrl}}/auth/request-otp
+Content-Type: application/json
+
+{
+  "email": "{{authEmail}}"
+}
+
+### Verify OTP: replace {{otpCode}} with the emailed code
+POST {{baseUrl}}/auth/verify-otp
+Content-Type: application/json
+
+{
+  "code": "{{otpCode}}"
+}
+
+### Reset Password: replace {{resetToken}} with token from email
+POST {{baseUrl}}/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "{{resetToken}}",
+  "password": "{{newPassword}}"
+}
+
+### Logout: clear admin session cookie
+POST {{baseUrl}}/auth/logout
+
+### Seed Admin: create admin user (one-time)
+POST {{baseUrl}}/auth/seed-admin
+Content-Type: application/json
+
+{
+  "email": "{{authEmail}}",
+  "password": "{{authPassword}}",
+  "name": "Admin"
+}
+
+### ===========================================
+### ATTENDEE REGISTRATION TEST
+### ===========================================
+
+### Test 1: Basic Attendee Registration
+POST {{baseUrl}}/attendee/attendee-registration
+Content-Type: application/json
+
+{
+  "firstName": "Benegeta",
+  "lastName": "Temesgen",
+  "email": "{{testEmail}}",
+  "phoneNumber": "+251911234567",
+  "organization": "GreenTech Solutions",
+  "jobTitle": "General Manager",
+  "country": "Ethiopia",
+  "category": "inv",
+  "sectorInterest": "Renewable Energy",
+  "hasExistingCompany": true,
+  "companyName": "GreenTech Solutions",
+  "companySector": "Non-profit organization",
+  "attendance": "day1",
+  "needsVisa": false,
+  "siteVisit": false,
+  "communicationPreference": "email"
+}
+
+### Test 2: Duplicate Email (Should Fail)
+POST {{baseUrl}}/attendee/attendee-registration
+Content-Type: application/json
+
+{
+  "firstName": "Duplicate",
+  "lastName": "User",
+  "email": "{{testEmail}}",
+  "phoneNumber": "+251999999999",
+  "organization": "Duplicate Org",
+  "jobTitle": "Test Manager",
+  "country": "Ethiopia",
+  "category": "loc",
+  "sectorInterest": "Consulting",
+  "hasExistingCompany": false,
+  "attendance": "day2",
+  "needsVisa": false,
+  "siteVisit": false,
+  "communicationPreference": "email"
+}
+
+### Test 3: Minimal Required Fields
+POST {{baseUrl}}/attendee/attendee-registration
+Content-Type: application/json
+
+{
+  "firstName": "Sarah",
+  "lastName": "Johnson",
+  "email": "{{testEmail2}}",
+  "phoneNumber": "+1234567890",
+  "organization": "Solar Energy International",
+  "jobTitle": "Business Development Director",
+  "country": "United States",
+  "category": "oth",
+  "communicationPreference": "email"
+}
+
+### Test 4: Missing Communication Preference (Should Fail)
+POST {{baseUrl}}/attendee/attendee-registration
+Content-Type: application/json
+
+{
+  "firstName": "Tesfaye",
+  "lastName": "Mekonnen",
+  "email": "{{testEmail3}}",
+  "phoneNumber": "+251912345678",
+  "organization": "Ethiopian Power Corporation",
+  "jobTitle": "Project Manager",
+  "country": "Ethiopia",
+  "category": "loc"
+}
+
+### ===========================================
+### CONTACT FORM TESTS
+### ===========================================
+
+### Test 5: Contact Form Submission
+POST {{baseUrl}}/contact/contact-form
+Content-Type: application/json
+
+{
+  "name": "Amanuel Bekele",
+  "email": "contact@example.com",
+  "phoneNumber": "+251900000000",
+  "jobTitle": "Coordinator",
+  "companyName": "Power Ethiopia",
+  "country": "Ethiopia",
+  "message": "We would like to learn more about the event."
+}
+
+### ===========================================
+### PAYMENT WEBHOOK TESTS
+### ===========================================
+
+### Test 7: Payment Webhook (Sample Chapa Webhook)
+POST {{baseUrl}}/payment/payment
+Content-Type: application/json
+
+{
+  "event": "charge.completed",
+  "data": {
+    "id": "test-transaction-id",
+    "tx_ref": "test-tx-ref-123",
+    "flw_ref": "test-flw-ref-456",
+    "device_fingerprint": "test-device-fingerprint",
+    "amount": 5000,
+    "currency": "ETB",
+    "charged_amount": 5000,
+    "app_fee": 150,
+    "merchant_fee": 0,
+    "processor_response": "Approved by Financial Institution",
+    "auth_model": "AUTH",
+    "card": {
+      "first_6digits": "123456",
+      "last_4digits": "7890",
+      "issuer": "TEST BANK",
+      "country": "ET",
+      "type": "VISA",
+      "expiry": "12/25"
+    },
+    "created_at": "2024-01-15T10:30:00.000Z",
+    "status": "successful"
+  }
+}
+
+### Test 8: Payment Webhook - Failed Transaction
+POST {{baseUrl}}/payment/payment
+Content-Type: application/json
+
+{
+  "event": "charge.failed",
+  "data": {
+    "id": "test-failed-transaction-id",
+    "tx_ref": "test-failed-tx-ref-789",
+    "flw_ref": "test-failed-flw-ref-012",
+    "device_fingerprint": "test-device-fingerprint-failed",
+    "amount": 3000,
+    "currency": "ETB",
+    "charged_amount": 0,
+    "app_fee": 0,
+    "merchant_fee": 0,
+    "processor_response": "Declined by Financial Institution",
+    "auth_model": "AUTH",
+    "created_at": "2024-01-15T10:35:00.000Z",
+    "status": "failed"
+  }
+}
+
+### ===========================================
+### ATTENDANCE TESTS
+### ===========================================
+
+### Test 9: Check-in Attendee
+POST {{baseUrl}}/attendance/checkin/REPLACE_WITH_ATTENDEE_ID
+
+### Test 10: Check-out Attendee
+POST {{baseUrl}}/attendance/checkout/REPLACE_WITH_ATTENDEE_ID
+
+### Test 11: Get Attendance Status
+GET {{baseUrl}}/attendance/status/REPLACE_WITH_ATTENDEE_ID
+Accept: application/json
+
+### Test 12: Attendance Summary (Admin)
+GET {{baseUrl}}/attendance/summary
+Accept: application/json
+
+### ===========================================
+### QR CODE VERIFICATION TESTS (UNIFIED SYSTEM)
+### ===========================================
+
+### Test 13: Verify Attendee by QR Code (New Format)
+POST {{baseUrl}}/qr/verify
+Content-Type: application/json
+
+{
+  "qrData": "GREEN_ENERGY_EVENT:ATT:507f1f77bcf86cd799439013"
+}
+
+### Test 14: Verify with Invalid QR Format
+POST {{baseUrl}}/qr/verify
+Content-Type: application/json
+
+{
+  "qrData": "INVALID_QR_DATA"
+}
+
+### Test 15: Verify with Invalid User Type
+POST {{baseUrl}}/qr/verify
+Content-Type: application/json
+
+{
+  "qrData": "GREEN_ENERGY_EVENT:INVALID:507f1f77bcf86cd799439011"
+}
+
+### Test 16: Get Attendee by ID
+GET {{baseUrl}}/qr/user/507f1f77bcf86cd799439013
+Accept: application/json
+
+### ===========================================
+### ADMIN DASHBOARD TESTS
+### ===========================================
+
+### Test 17: Admin Analytics
+GET {{baseUrl}}/admin/analytics
+Accept: application/json
+
+### Test 18: Admin Counts
+GET {{baseUrl}}/admin/counts
+Accept: application/json
+
+### Test 19: Admin Attendees
+GET {{baseUrl}}/admin/attendees
+Accept: application/json
+
+### Test 20: Admin Contacts
+GET {{baseUrl}}/admin/contacts
+Accept: application/json
+
+### ===========================================
+### COMMUNICATIONS (ADMIN) TESTS
+### ===========================================
+
+### Test 21: Templates
+GET {{baseUrl}}/admin/communications/templates
+Accept: application/json
+
+### Test 22: Stats
+GET {{baseUrl}}/admin/communications/stats
+Accept: application/json
+
+### Test 23: Recent Messages
+GET {{baseUrl}}/admin/communications/recent?limit=5
+Accept: application/json
+
+### Test 24: Send Email
+POST {{baseUrl}}/admin/communications/email/send
+Content-Type: application/json
+
+{
+  "audience": "all",
+  "subject": "Test Announcement",
+  "body": "<p>This is a test email.</p>"
+}
+
+### Test 25: Email Campaigns
+GET {{baseUrl}}/admin/communications/email/campaigns
+Accept: application/json
+
+### Test 26: SMS Stats
+GET {{baseUrl}}/admin/communications/sms/stats
+Accept: application/json
+
+### Test 27: Notifications Recent
+GET {{baseUrl}}/admin/communications/notifications/recent?limit=5
+Accept: application/json
+
+### Test 28: Notifications Platform Stats
+GET {{baseUrl}}/admin/communications/notifications/platform
+Accept: application/json
+
+### ===========================================
+### FAILED EMAILS TESTS
+### ===========================================
+
+### Test 29: List Failed Emails
+GET {{baseUrl}}/failed-emails
+Accept: application/json
+
+### Test 30: Failed Emails by Status
+GET {{baseUrl}}/failed-emails/by-status/failed
+Accept: application/json
+
+### Test 31: Failed Emails by Type
+GET {{baseUrl}}/failed-emails/by-type/attendee
+Accept: application/json
+
+### Test 32: Retryable Failed Emails
+GET {{baseUrl}}/failed-emails/retryable
+Accept: application/json
+
+### Test 33: Failed Email Stats
+GET {{baseUrl}}/failed-emails/stats
+Accept: application/json
+
+### Test 34: Update Failed Email Status
+PATCH {{baseUrl}}/failed-emails/REPLACE_WITH_FAILED_EMAIL_ID/status
+Content-Type: application/json
+
+{
+  "status": "retrying",
+  "errorMessage": "Manual retry"
+}
+
+### Test 35: Mark Failed Email as Retrying
+PATCH {{baseUrl}}/failed-emails/REPLACE_WITH_FAILED_EMAIL_ID/retrying
+
+### Test 36: Mark Failed Email as Sent
+PATCH {{baseUrl}}/failed-emails/REPLACE_WITH_FAILED_EMAIL_ID/sent
+
+### Test 37: Retry Failed Email
+POST {{baseUrl}}/failed-emails/REPLACE_WITH_FAILED_EMAIL_ID/retry
+
+### Test 38: Delete Failed Email
+DELETE {{baseUrl}}/failed-emails/REPLACE_WITH_FAILED_EMAIL_ID
+
+### ===========================================
+### HEALTH CHECK / SERVER STATUS
+### ===========================================
+
+### Test 12: Check if server is running (Basic GET request)
+GET {{baseUrl}}/health
+Accept: application/json
+
+### ===========================================
+### NOTES FOR TESTING
+### ===========================================
+
+# 1. Update the @baseUrl variable at the top to match your server URL
+# 2. Make sure your server is running before testing
+# 3. For local testing, use: http://localhost:3000/api
+# 4. For production, use your deployed URL
+# 5. Change the email addresses in the @testEmail variables to avoid conflicts
+# 6. The payment webhook tests are for when you re-enable Chapa integration
+# 7. Tests 5 and 6 are designed to fail - they test error handling
+# 8. Make sure your database is connected and running

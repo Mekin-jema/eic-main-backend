@@ -1,0 +1,52 @@
+{
+    "name": "green_energy_event",
+    "version": "1.0.0",
+    "description": "",
+    "main": "server.ts",
+    "scripts": {
+        "start": "node dist/server.js",
+        "build": "tsc",
+        "watch": "tsc -w",
+        "dev": "NODE_ENV=DEVELOPMENT nodemon --exec ts-node src/server.ts",
+        "prod": "NODE_ENV=PRODUCTION node dist/server.js",
+        "prebuild": "rimraf dist",
+        "preview:badges": "ts-node src/scripts/badgePreview.ts",
+        "preview:badges:advanced": "ts-node src/scripts/badgePreviewAdvanced.ts",
+        "generate:attendee-qr": "ts-node src/scripts/generateSponsorQR.ts",
+        "db:seed": "ts-node src/seed.ts"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "@types/cookie-parser": "^1.4.8",
+        "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.1",
+        "@types/multer": "^2.0.0",
+        "@types/node": "^22.19.7",
+        "nodemon": "^3.1.10",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.8.3"
+    },
+    "dependencies": {
+        "@types/nodemailer": "^7.0.2",
+        "@types/pdfkit": "^0.17.3",
+        "@types/qrcode": "^1.5.5",
+        "@zxing/library": "^0.21.3",
+        "chapa-nodejs": "^2.0.1",
+        "cookie-parse": "^0.4.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "dotenv": "^16.5.0",
+        "express": "^5.1.0",
+        "express-validator": "^7.2.1",
+        "mongoose": "^9.1.5",
+        "multer": "^2.0.2",
+        "nodemailer": "^7.0.6",
+        "pdfkit": "^0.17.2",
+        "qrcode": "^1.5.4",
+        "react-qr-scanner": "^1.0.0-alpha.11",
+        "rimraf": "^6.0.1",
+        "xss-clean": "^0.1.4"
+    }
+}
