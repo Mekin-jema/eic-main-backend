@@ -1,2 +1,0 @@
-// Exhibitor validator removed.
-export {};

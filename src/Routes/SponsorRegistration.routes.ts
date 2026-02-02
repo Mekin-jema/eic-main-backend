@@ -1,2 +1,0 @@
-// Sponsor routes removed.
-export {};

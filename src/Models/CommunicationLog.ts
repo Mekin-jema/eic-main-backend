@@ -10,6 +10,7 @@ const CommunicationLogSchema = applyBaseSchemaOptions(
       subject: { type: String, required: true },
       body: { type: String, required: true },
       sentCount: { type: Number, required: true },
+      scheduledFor: { type: Date },
       openedCount: { type: Number },
       clickedCount: { type: Number },
       bouncedCount: { type: Number },

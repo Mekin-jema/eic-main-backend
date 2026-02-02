@@ -3,7 +3,7 @@ import { FailedEmailService } from '../Services/FailedEmailService';
 import { generateAttendeeBadge } from './badgeGenerator';
 
 // Create transporter with cloud-optimized settings
-const createTransporter = () => {
+export const createTransporter = () => {
     return nodemailer.createTransport({
         host: 'mail.powerethio.com', // cPanel SMTP server
         port: 465, // SSL port as per cPanel settings
@@ -27,11 +27,6 @@ const createTransporter = () => {
             rejectUnauthorized: false
         }
     });
-};
-
-// Email template for exhibitor registration confirmation
-export const createExhibitorConfirmationEmail = async () => {
-    throw new Error('Exhibitor emails removed');
 };
 
 // Email template for contact form confirmation
@@ -191,94 +186,94 @@ export const createAttendeeConfirmationEmail = async (attendeeData: any) => {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Registration Confirmation</title>
-        <style>
-          body {
-            font-family: Arial, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f4f4f4;
-          }
-          .email-container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-          }
-          .header {
-            text-align: center;
-            margin-bottom: 30px;
-          }
-          .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c5aa0;
-            margin-bottom: 10px;
-          }
-          .content {
-            margin-bottom: 30px;
-          }
-          .footer {
-            text-align: center;
-            color: #666;
-            font-size: 14px;
-            border-top: 1px solid #eee;
-            padding-top: 20px;
-          }
-          .highlight {
-            background-color: #e8f4f8;
-            padding: 15px;
-            border-left: 4px solid #2c5aa0;
-            margin: 15px 0;
-          }
-        </style>
       </head>
-      <body>
-        <div class="email-container">
-          <div class="header">
-            <div class="logo">Green Energy Technology Expo 2025</div>
-            <h1>Welcome to the Event!</h1>
-          </div>
-          
-          <div class="content">
-            <p>Dear ${firstName} ${lastName},</p>
-            
-            <p>Thank you for registering for the Green Energy Technology Expo 2025! We're excited to have you join us for this premier event.</p>
-            
-            <div class="highlight">
-              <p><strong>Please download your Attendee Badge attached to this email.</strong></p>
-              <p><strong>Registration Details:</strong></p>
-              <p>Thank you for registering as an attendee.</p>
-            </div>
-            
-            <p><strong>What's Next?</strong></p>
-            <ul>
-              <li>You will receive event updates and important information via email</li>
-              <li>Print your badge and bring it to the event for quick entry</li>
-              <li>Check our website for the latest agenda and speaker information</li>
-            </ul>
-            
-            <p><strong>Event Information:</strong></p>
-            <ul>
-              <li>Theme: "Powering Ethiopia: Youth, Energy, and Innovation"</li>
-              <li>Date: December 19-21, 2025 (Tahesas 10-12)</li>
-              <li>Location: Millennium Hall, Addis Ababa</li>
-              <li>Duration: 3 days</li>
-            </ul>
-            
-            <p>We look forward to seeing you at the event!</p>
-            
-            <p>Best regards,<br>
-            Power Ethiopia Solar Technology Institute & Ethiopian Global Youth Group (EGYG)</p>
-          </div>
-          
-          <div class="footer">
-            <p>This is an automated message. Please do not reply to this email.</p>
-            <p>For questions, please contact us at powerethiopiaco@gmail.com or +251 988 577 712</p>
-          </div>
-        </div>
+      <body style="margin:0;padding:0;background-color:#f6f7fb;font-family:Arial,Helvetica,sans-serif;color:#1f2937;">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f7fb;padding:24px 12px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:100%;max-width:600px;background:#ffffff;border-radius:14px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
+                <tr>
+                  <td style="background:#0f766e;padding:28px 32px;color:#ffffff;">
+                    <h1 style="margin:0;font-size:22px;line-height:1.3;">Green Energy Technology Expo 2025</h1>
+                    <p style="margin:6px 0 0;font-size:14px;opacity:0.9;">Registration Confirmed</p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:28px 32px;">
+                    <h2 style="margin:0 0 8px;font-size:20px;">Welcome, ${firstName} ${lastName}!</h2>
+                    <p style="margin:0 0 16px;font-size:14px;line-height:1.6;">
+                      Thank you for registering for the Green Energy Technology Expo 2025. Your seat is confirmed, and your attendee badge is attached to this email.
+                    </p>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f1f5f9;border-radius:12px;padding:16px;margin:16px 0;">
+                      <tr>
+                        <td style="font-size:13px;line-height:1.6;">
+                          <strong>Registration Summary</strong><br/>
+                          Registration type: ${registrationType || 'Attendee'}<br/>
+                          Group size: ${groupSize || '1'}<br/>
+                          Email: ${email}
+                        </td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:18px 0 10px;">
+                      <tr>
+                        <td align="left">
+                          <a href="https://investethiopia.gov.et/" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:8px;font-size:14px;font-weight:bold;">Explore Investment Resources</a>
+                        </td>
+                      </tr>
+                    </table>
+
+                    <h3 style="margin:18px 0 8px;font-size:16px;">Event Highlights</h3>
+                    <ul style="margin:0 0 16px;padding-left:18px;font-size:14px;line-height:1.6;">
+                      <li>Cutting-edge clean energy innovations and technology showcases.</li>
+                      <li>Networking with industry leaders, investors, and public stakeholders.</li>
+                      <li>Practical sessions on policy, financing, and deployment.</li>
+                    </ul>
+
+                    <h3 style="margin:18px 0 8px;font-size:16px;">Plan Your Visit</h3>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="font-size:14px;line-height:1.6;">
+                      <tr>
+                        <td style="padding:6px 0;"><strong>Dates:</strong> Dec 19–21, 2025</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;"><strong>Venue:</strong> Millennium Hall, Addis Ababa</td>
+                      </tr>
+                      <tr>
+                        <td style="padding:6px 0;"><strong>Badge:</strong> Print and bring your attached PDF for fast entry</td>
+                      </tr>
+                    </table>
+
+                    <h3 style="margin:18px 0 8px;font-size:16px;">Resources</h3>
+                    <p style="margin:0 0 6px;font-size:14px;line-height:1.6;">
+                      Learn more about Ethiopia’s investment landscape and opportunities:
+                    </p>
+                    <ul style="margin:0 0 4px;padding-left:18px;font-size:14px;line-height:1.6;">
+                      <li><a href="https://investethiopia.gov.et/" style="color:#0f766e;text-decoration:none;">Invest Ethiopia – Official Portal</a></li>
+                      <li><a href="https://investethiopia.gov.et/" style="color:#0f766e;text-decoration:none;">Investment Opportunities & Sectors</a></li>
+                      <li><a href="https://investethiopia.gov.et/" style="color:#0f766e;text-decoration:none;">News & Updates</a></li>
+                    </ul>
+
+                    <p style="margin:18px 0 0;font-size:14px;line-height:1.6;">
+                      We look forward to welcoming you.
+                    </p>
+                    <p style="margin:6px 0 0;font-size:14px;line-height:1.6;">
+                      Power Ethiopia Solar Technology Institute & Ethiopian Global Youth Group (EGYG)
+                    </p>
+                  </td>
+                </tr>
+
+                <tr>
+                  <td style="padding:18px 32px 28px;color:#6b7280;font-size:12px;border-top:1px solid #eef2f7;">
+                    This is an automated message. Please do not reply.<br/>
+                    Contact: powerethiopiaco@gmail.com • +251 988 577 712
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
       </body>
       </html>
     `
@@ -330,24 +325,3 @@ export const sendAttendeeConfirmationEmail = async (attendeeData: any) => {
     return { success: false, error: lastError };
 };
 
-// Exhibitor/sponsor emails removed.
-export const sendExhibitorConfirmationEmail = async () => {
-    throw new Error('Exhibitor emails removed');
-};
-
-export const createSponsorConfirmationEmail = async () => {
-    throw new Error('Sponsor emails removed');
-};
-
-export const sendSponsorConfirmationEmail = async () => {
-  throw new Error('Sponsor emails removed');
-};
-
-// Email template for exhibitor "under review" status
-export const createExhibitorUnderReviewEmail = async () => {
-    throw new Error('Exhibitor emails removed');
-};
-
-export const sendExhibitorUnderReviewEmail = async () => {
-    throw new Error('Exhibitor emails removed');
-};

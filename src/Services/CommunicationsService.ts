@@ -5,15 +5,84 @@ import CommunicationSettings from '../Models/CommunicationSettings';
 import SmsLog from '../Models/SmsLog';
 import NotificationLog from '../Models/NotificationLog';
 
-export type AudienceFilter = 'all' | 'checked-in' | 'pending' | 'vip' | 'speakers';
+export type AudienceFilter = 'all' | 'checked-in' | 'pending' | 'vip' | 'speakers' | 'custom';
 
 export class CommunicationsService {
   static async ensureDefaultTemplates() {
     const defaults = [
-      { key: 'welcome', name: 'Welcome Email', subject: 'Welcome to Invest Ethiopia Forum 2026' },
-      { key: 'checkin-reminder', name: 'Check-in Reminder', subject: 'Important: Check-in Information' },
-      { key: 'vip-invite', name: 'VIP Invitation', subject: 'Exclusive VIP Event Invitation' },
-      { key: 'post-event', name: 'Post-Event Follow-up', subject: 'Thank You & Next Steps' },
+      {
+        key: 'welcome',
+        name: 'Welcome Email',
+        subject: 'Welcome to Invest Ethiopia Forum 2026',
+        body: `Dear Attendee,
+
+Welcome to the Invest Ethiopia Forum 2026! We're excited to have you join us for this premier investment event.
+
+Important Details:
+• Date: May 12-13, 2026
+• Venue: Ethiopian Skylight Hotel, Addis Ababa
+• Check-in: Starts at 8:00 AM
+
+Please bring your registration confirmation and ID.
+
+Best regards,
+Invest Ethiopia Forum Team`,
+      },
+      {
+        key: 'checkin-reminder',
+        name: 'Check-in Reminder',
+        subject: 'Important: Check-in Information',
+        body: `Dear Attendee,
+
+This is a friendly reminder about check-in for Invest Ethiopia Forum 2026.
+
+Check-in Details:
+• Date: May 12-13, 2026
+• Time: 8:00 AM – 10:30 AM
+• Venue: Ethiopian Skylight Hotel, Addis Ababa
+
+Please bring your registration confirmation and a valid ID for quick entry.
+
+We look forward to welcoming you.
+
+Best regards,
+Invest Ethiopia Forum Team`,
+      },
+      {
+        key: 'vip-invite',
+        name: 'VIP Invitation',
+        subject: 'Exclusive VIP Event Invitation',
+        body: `Dear Esteemed Guest,
+
+You are cordially invited to the Invest Ethiopia Forum 2026 VIP experience.
+
+VIP Access Includes:
+• Priority check-in and seating
+• Private networking lounge
+• Exclusive meetings with key stakeholders
+
+Please confirm your attendance so we can reserve your VIP access.
+
+Warm regards,
+Invest Ethiopia Forum Team`,
+      },
+      {
+        key: 'post-event',
+        name: 'Post-Event Follow-up',
+        subject: 'Thank You & Next Steps',
+        body: `Dear Attendee,
+
+Thank you for attending Invest Ethiopia Forum 2026. We appreciate your participation and engagement.
+
+Next Steps:
+• You will receive a summary of key sessions and materials shortly.
+• For follow-ups, please reply with any questions or partnership interests.
+
+We look forward to staying connected.
+
+Best regards,
+Invest Ethiopia Forum Team`,
+      },
     ];
     for (const tpl of defaults) {
       await CommunicationTemplate.findOneAndUpdate(
@@ -131,7 +200,7 @@ export class CommunicationsService {
     };
   }
 
-  static async resolveAudience(audience: AudienceFilter): Promise<Array<{ email: string; name: string }>> {
+  static async resolveAudience(audience: AudienceFilter): Promise<Array<{ email: string; firstName?: string; lastName?: string; fullName?: string; organization?: string }>> {
     // Fetch recipient emails by audience filter
     const attendees = await AttendeeRegistration.find();
     const filterFn = (a: any) => {
@@ -151,7 +220,27 @@ export class CommunicationsService {
     };
     return attendees
       .filter(filterFn)
-      .map((a: any) => ({ email: String(a.email), name: `${a.firstName} ${a.lastName}` }));
+      .map((a: any) => ({
+        email: String(a.email),
+        firstName: a.firstName,
+        lastName: a.lastName,
+        fullName: `${a.firstName} ${a.lastName}`.trim(),
+        organization: a.organization,
+      }));
+  }
+
+  static async resolveRecipientsByIds(ids: string[]): Promise<Array<{ email: string; firstName?: string; lastName?: string; fullName?: string; organization?: string }>> {
+    if (!ids.length) return [];
+    const attendees = await AttendeeRegistration.find({ _id: { $in: ids } });
+    return attendees
+      .filter((a: any) => Boolean(a.email))
+      .map((a: any) => ({
+        email: String(a.email),
+        firstName: a.firstName,
+        lastName: a.lastName,
+        fullName: `${a.firstName} ${a.lastName}`.trim(),
+        organization: a.organization,
+      }));
   }
 
   static async logEmailSend(params: {
@@ -164,6 +253,7 @@ export class CommunicationsService {
     clickedCount?: number;
     bouncedCount?: number;
     status?: string;
+    scheduledFor?: Date | null;
   }) {
     const log = await CommunicationLog.create({ channel: 'email', status: 'completed', ...params });
     if (params.templateKey) {
@@ -173,5 +263,43 @@ export class CommunicationsService {
       );
     }
     return log;
+  }
+
+  static async scheduleEmail(params: {
+    templateKey?: string;
+    audience: AudienceFilter;
+    subject: string;
+    body: string;
+    scheduledFor: Date;
+  }) {
+    const log = await CommunicationLog.create({
+      channel: 'email',
+      status: 'scheduled',
+      sentCount: 0,
+      ...params,
+    });
+    if (params.templateKey) {
+      await CommunicationTemplate.findOneAndUpdate(
+        { key: params.templateKey },
+        { $inc: { usedCount: 1 }, $set: { lastUsedAt: new Date() } }
+      );
+    }
+    return log;
+  }
+
+  static async createTemplate(params: { key: string; name: string; subject: string; body?: string }) {
+    const existing = await CommunicationTemplate.findOne({ key: params.key });
+    if (existing) {
+      throw new Error('Template key already exists');
+    }
+    return CommunicationTemplate.create(params);
+  }
+
+  static async updateTemplate(id: string, params: { name?: string; subject?: string; body?: string }) {
+    return CommunicationTemplate.findByIdAndUpdate(id, { $set: params }, { new: true });
+  }
+
+  static async deleteTemplate(id: string) {
+    return CommunicationTemplate.findByIdAndDelete(id);
   }
 }

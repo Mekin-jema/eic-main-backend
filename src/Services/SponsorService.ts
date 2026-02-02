@@ -1,2 +1,0 @@
-// Sponsor features removed.
-export {};

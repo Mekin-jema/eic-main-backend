@@ -37,7 +37,6 @@ export class AdminService {
         };
     }
 
-    // Get all exhibitor applications with status
     // Get all attendees
     static async getAllAttendees() {
         return await AttendeeRegistration.find().sort({ createdAt: -1 });

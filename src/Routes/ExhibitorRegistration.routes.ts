@@ -1,2 +1,0 @@
-// Exhibitor routes removed.
-export {};
