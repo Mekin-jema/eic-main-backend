@@ -15,32 +15,34 @@
     "db:seed": "ts-node src/seed.ts"
   },
   "devDependencies": {
-    "rimraf": "^6.0.1",
-    "nodemon": "^3.1.10",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3",
-    "@types/node": "^20.11.30",
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.1",
     "@types/mongoose": "^5.11.97",
-    "@types/cors": "^2.8.17",
-    "@types/cookie-parser": "^1.4.8",
-    "@types/multer": "^2.0.0"
+    "@types/multer": "^2.0.0",
+    "@types/node": "^20.11.30",
+    "@types/nodemailer": "^7.0.9",
+    "@types/pdfkit": "^0.17.4",
+    "@types/qrcode": "^1.5.6",
+    "nodemon": "^3.1.10",
+    "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
-    "express": "^5.1.0",
-    "mongoose": "^9.1.5",
+    "@types/node": "^20.11.30",
+    "@zxing/library": "^0.21.3",
+    "chapa-nodejs": "^2.0.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
-    "cookie-parser": "^1.4.7",
+    "express": "^5.1.0",
     "express-validator": "^7.2.1",
+    "mongoose": "^9.1.5",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
     "pdfkit": "^0.17.2",
     "qrcode": "^1.5.4",
-    "@zxing/library": "^0.21.3",
-    "chapa-nodejs": "^2.0.1",
-    "xss-clean": "^0.1.4",
-      "@types/node": "^20.11.30"
-
+    "xss-clean": "^0.1.4"
   }
 }
