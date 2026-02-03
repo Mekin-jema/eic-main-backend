@@ -1,25 +1,19 @@
 {
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "CommonJS",
-
-    "rootDir": "src",
-    "outDir": "dist",
-
-    "moduleResolution": "node",
-
-    "types": ["node"],
-    "lib": ["ES2020"],
-
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-
-    "strict": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-
-    "declaration": false
+    "target": "es2020", // Specify ECMAScript target version: ES5, ES6/ES2015, ES2020, etc.
+    "module": "CommonJS", // Specify module code generation: 'CommonJS', 'ES6', 'ESNext', etc.
+    "rootDir": "./src", // Specify the root directory of input files
+    "outDir": "./dist", // Redirect output structure to the `dist` folder
+    "strict": true, // Enable all strict type-checking options
+    "isolatedModules": true,
+    "declaration": true,
+    "moduleResolution": "node", // Specify module resolution strategy: 'node' for Node.js
+    "esModuleInterop": true, // Enables compatibility with ES modules
+    "resolveJsonModule": true, // Include modules imported from .json files
+    "skipLibCheck": true, // Skip type checking of all declaration files (.d.ts)
+    "noImplicitAny": true, // Raise an error on expressions and declarations with an implied 'any' type
+    "forceConsistentCasingInFileNames": true // Ensure file names are treated consistently across case-sensitive file systems
   },
-  "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src/**/*"], // Include all .ts files under the src directory; seed runs via tsx, not tsc
+  "exclude": ["node_modules"] // Exclude node_modules and dist directories from compilation
 }
