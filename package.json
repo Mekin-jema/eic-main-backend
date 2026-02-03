@@ -39,6 +39,8 @@
     "qrcode": "^1.5.4",
     "@zxing/library": "^0.21.3",
     "chapa-nodejs": "^2.0.1",
-    "xss-clean": "^0.1.4"
+    "xss-clean": "^0.1.4",
+      "@types/node": "^20.11.30"
+
   }
 }
