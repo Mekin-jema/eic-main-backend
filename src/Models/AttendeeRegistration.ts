@@ -40,6 +40,7 @@ const AttendeeRegistrationSchema = applyBaseSchemaOptions(
         ],
         default: null,
       },
+      otherCategory: { type: String },
       communicationPreference: { type: String, enum: ['email', 'phone', 'both'], required: true },
       companyName: { type: String },
       companySector: { type: String },

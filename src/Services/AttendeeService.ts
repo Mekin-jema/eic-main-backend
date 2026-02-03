@@ -11,6 +11,7 @@ export class AttendeeService {
             jobTitle: data.jobTitle,
             country: data.country,
             category: data.category,
+            otherCategory: data.otherCategory,
             sectorInterest: data.sectorInterest,
             hasExistingCompany: data.hasExistingCompany ?? false,
             companyName: data.companyName,

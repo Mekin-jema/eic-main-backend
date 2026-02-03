@@ -9,6 +9,7 @@ export const AttendeeRegistrationValidator = [
     body('jobTitle').notEmpty().withMessage('Job title is required'),
     body('country').notEmpty().withMessage('Country is required'),
     body('category').optional().isString().withMessage('Invalid category'),
+    body('otherCategory').optional().isString().withMessage('Other category must be a string'),
     body('sectorInterest').optional().isString().withMessage('Sector interest must be a string'),
     body('hasExistingCompany').optional().isIn(['true', 'false', '1', '0', 'yes', 'no']).withMessage('Invalid value for existing company'),
     body('companyName').optional().isString().withMessage('Company name must be a string'),

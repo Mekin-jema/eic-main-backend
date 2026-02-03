@@ -5,6 +5,47 @@ import { AttendeeService } from '../Services/AttendeeService';
 import { errorHandler } from '../Utils/errorHandler';
 import { generateAttendeeBadge } from '../Utils/badgeGenerator';
 import { createTransporter } from '../Utils/emailService';
+
+const normalizeCategory = (value: unknown): string | undefined => {
+    if (value === undefined || value === null) return undefined;
+    if (typeof value !== 'string') return undefined;
+    const trimmed = value.trim();
+    if (!trimmed) return undefined;
+
+    const directMap: Record<string, string> = {
+        Investor: 'inv',
+        'International Investor': 'inv',
+        'Domestic Investor': 'loc',
+        'Local Investor': 'loc',
+        'Government Official': 'gov',
+        'Diplomat / Development Partner': 'dip',
+        Media: 'med',
+        'Academia/Research Institution': 'aca',
+        'Academia / Research Institution': 'aca',
+        'Business Consultant': 'con',
+        Other: 'oth',
+    };
+
+    if (directMap[trimmed]) return directMap[trimmed];
+
+    const normalized = trimmed.toLowerCase();
+    const lowerMap: Record<string, string> = {
+        investor: 'inv',
+        'international investor': 'inv',
+        'domestic investor': 'loc',
+        'local investor': 'loc',
+        'government official': 'gov',
+        'diplomat / development partner': 'dip',
+        'diplomat/development partner': 'dip',
+        media: 'med',
+        'academia/research institution': 'aca',
+        'academia / research institution': 'aca',
+        'business consultant': 'con',
+        other: 'oth',
+    };
+
+    return lowerMap[normalized] ?? trimmed;
+};
 export const getAttendeeById = catchAsyncError(async (req, res, next) => {
     let { id } = req.params;
     if (Array.isArray(id)) id = id[0];
@@ -19,7 +60,11 @@ export const getAttendeeById = catchAsyncError(async (req, res, next) => {
 export const updateAttendee = catchAsyncError(async (req, res, next) => {
     let { id } = req.params;
     if (Array.isArray(id)) id = id[0];
-    const updated = await AttendeeService.update(id, req.body);
+    const payload = { ...req.body };
+    if ('category' in payload) {
+        payload.category = normalizeCategory(payload.category);
+    }
+    const updated = await AttendeeService.update(id, payload);
     if (!updated) {
         return next(new errorHandler('Attendee not found', 404));
     }
@@ -134,7 +179,8 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
     const organization = body.organization
     const jobTitle = body.jobTitle
     const country = body.country
-    const category = body.category || undefined
+    const category = normalizeCategory(body.category)
+    const otherCategory = body.otherCategory || undefined
     const sectorInterest = body.sectorInterest || undefined
     const hasExistingCompanyRaw = body.hasExistingCompany
     const hasExistingCompany = typeof hasExistingCompanyRaw === 'boolean'
@@ -166,8 +212,12 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
         return next(new errorHandler('Attendee already registered with this email.', 400));
     }
 
-    if (category && ['inv', 'loc'].includes(category) && !sectorInterest) {
+    if (typeof category === 'string' && ['inv', 'loc'].includes(category) && !sectorInterest) {
         return next(new errorHandler('Sector interest is required for investors.', 400));
+    }
+
+    if (category === 'oth' && !otherCategory) {
+        return next(new errorHandler('Please specify your category.', 400));
     }
 
     if (hasExistingCompany && !companyName) {
@@ -197,6 +247,7 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
         jobTitle,
         country,
         category,
+        otherCategory,
         sectorInterest,
         hasExistingCompany,
         companyName,
