@@ -4,29 +4,36 @@ import { generateAttendeeBadge } from './badgeGenerator';
 
 // Create transporter with cloud-optimized settings
 export const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: 'mail.eic.gov.et', // cPanel SMTP server
-        port: 465, // SSL port as per cPanel settings
-        secure: true, // SSL/TLS as recommended by cPanel
-        auth: {
-            user: 'invitationsie2026@eic.gov.et',
-            pass: 'bH.hw(k1%P$aFZFC'
-        },
-        // Cloud deployment optimizations
-        connectionTimeout: 60000, // 60 seconds
-        greetingTimeout: 30000, // 30 seconds
-        socketTimeout: 60000, // 60 seconds
-        // Connection pooling for better performance
-        pool: true,
-        maxConnections: 5,
-        maxMessages: 100,
-        rateDelta: 20000, // 20 seconds
-        rateLimit: 5, // max 5 messages per rateDelta
-        // TLS options for better compatibility
-        tls: {
-            rejectUnauthorized: false
-        }
-    });
+  const host = process.env.SMTP_HOST || 'mail.powerethio.com';
+  const port = Number(process.env.SMTP_PORT || 465);
+  const secure = String(process.env.SMTP_SECURE || 'true').toLowerCase() === 'true';
+  const user = process.env.SMTP_USER || 'noreply@powerethio.com';
+  const pass = process.env.SMTP_PASS || '';
+  const rejectUnauthorized = String(process.env.SMTP_TLS_REJECT_UNAUTHORIZED || 'false').toLowerCase() === 'true';
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure,
+    auth: {
+      user,
+      pass,
+    },
+    // Cloud deployment optimizations
+    connectionTimeout: 60000,
+    greetingTimeout: 30000,
+    socketTimeout: 60000,
+    // Connection pooling for better performance
+    pool: true,
+    maxConnections: 5,
+    maxMessages: 100,
+    rateDelta: 20000,
+    rateLimit: 5,
+    // TLS options for better compatibility
+    tls: {
+      rejectUnauthorized,
+    },
+  });
 };
 
 // Email template for contact form confirmation
