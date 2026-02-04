@@ -46,6 +46,39 @@ const normalizeCategory = (value: unknown): string | undefined => {
 
     return lowerMap[normalized] ?? trimmed;
 };
+
+const DAY1_SESSION_IDS = [
+    'day1-panel-1',
+    'day1-breakout-1',
+    'day1-breakout-2',
+    'day1-breakout-3',
+    'day1-matchmaking',
+];
+
+const DAY2_SESSION_IDS = [
+    'day2-panel-2',
+    'day2-breakout-4',
+    'day2-breakout-5',
+    'day2-breakout-6',
+];
+
+const parseSessionList = (value: unknown): string[] => {
+    if (Array.isArray(value)) return value.map(String).filter(Boolean);
+    if (typeof value === 'string') {
+        const trimmed = value.trim();
+        if (!trimmed) return [];
+        try {
+            const parsed = JSON.parse(trimmed);
+            if (Array.isArray(parsed)) return parsed.map(String).filter(Boolean);
+        } catch {
+            // ignore JSON parse errors
+        }
+        return trimmed.split(',').map((item) => item.trim()).filter(Boolean);
+    }
+    return [];
+};
+
+const sanitizeSessions = (list: string[], allowed: string[]) => list.filter((item) => allowed.includes(item));
 export const getAttendeeById = catchAsyncError(async (req, res, next) => {
     let { id } = req.params;
     if (Array.isArray(id)) id = id[0];
@@ -192,6 +225,12 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
     const companySector = body.companySector
     const attendanceRaw = body.attendance
     const attendance = ['day1', 'day2', 'both'].includes(attendanceRaw) ? attendanceRaw : undefined
+    const day1AttendanceRaw = body.day1Attendance
+    const day2AttendanceRaw = body.day2Attendance
+    const day1Attendance = ['full', 'partial', 'no'].includes(day1AttendanceRaw) ? day1AttendanceRaw : undefined
+    const day2Attendance = ['full', 'partial', 'no'].includes(day2AttendanceRaw) ? day2AttendanceRaw : undefined
+    const day1Sessions = sanitizeSessions(parseSessionList(body.day1Sessions), DAY1_SESSION_IDS)
+    const day2Sessions = sanitizeSessions(parseSessionList(body.day2Sessions), DAY2_SESSION_IDS)
     const needsVisaRaw = body.needsVisa
     const needsVisa = typeof needsVisaRaw === 'boolean'
         ? needsVisaRaw
@@ -228,6 +267,14 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
         return next(new errorHandler('Communication preference is required.', 400));
     }
 
+    if (day1Attendance === 'partial' && day1Sessions.length === 0) {
+        return next(new errorHandler('Please select at least one Day 1 session.', 400));
+    }
+
+    if (day2Attendance === 'partial' && day2Sessions.length === 0) {
+        return next(new errorHandler('Please select at least one Day 2 session.', 400));
+    }
+
     const files = (req as any).files as Record<string, Express.Multer.File[]> | undefined
     const businessLicenseFile = files?.businessLicense?.[0]
     const passportCopyFile = files?.passportCopy?.[0]
@@ -254,6 +301,10 @@ export const AttendeeRegistration = catchAsyncError(async (req, res, next) => {
         companySector,
         businessLicenseUrl,
         attendance,
+        day1Attendance,
+        day1Sessions: day1Attendance === 'partial' ? day1Sessions : [],
+        day2Attendance,
+        day2Sessions: day2Attendance === 'partial' ? day2Sessions : [],
         needsVisa,
         siteVisit,
         passportCopyUrl,

@@ -18,6 +18,10 @@ const AttendeeRegistrationSchema = applyBaseSchemaOptions(
       businessLicenseUrl: { type: String },
       needsVisa: { type: Boolean, default: false },
       attendance: { type: String, enum: ['day1', 'day2', 'both'], default: null },
+      day1Attendance: { type: String, enum: ['full', 'partial', 'no'], default: null },
+      day1Sessions: { type: [String], default: [] },
+      day2Attendance: { type: String, enum: ['full', 'partial', 'no'], default: null },
+      day2Sessions: { type: [String], default: [] },
       category: {
         type: String,
         enum: [
